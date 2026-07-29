@@ -19,26 +19,34 @@ export const registry = {
         return ALL_ENDPOINTS;
     },
 
+    has(id) {
+        return ALL_ENDPOINTS.some(e => e.id === id);
+    },
+
     getById(id) {
         return ALL_ENDPOINTS.find(e => e.id === id) ?? ALL_ENDPOINTS[0];
     },
 
-    async getActiveId() {
-        const r = await chrome.storage.sync.get('activeEndpoint');
-        return r.activeEndpoint ?? 'dynalist';
+    // Bookmarks are saved to every active endpoint. Older installs stored a single
+    // `activeEndpoint` string — read it as a one-element list, dropped on the next write.
+    async getActiveIds() {
+        const r   = await chrome.storage.sync.get(['activeEndpoints', 'activeEndpoint']);
+        const ids = Array.isArray(r.activeEndpoints)
+            ? r.activeEndpoints
+            : [r.activeEndpoint ?? 'dynalist'];
+        // Drop unknown ids — getById() falls back to the first endpoint, so a stale id
+        // would otherwise silently duplicate it into the fan-out.
+        return ids.filter(id => this.has(id));
     },
 
-    async setActiveId(id) {
-        await chrome.storage.sync.set({ activeEndpoint: id });
+    async setActiveIds(ids) {
+        await chrome.storage.sync.set({ activeEndpoints: ids });
+        await chrome.storage.sync.remove('activeEndpoint');
     },
 
-    async getActive() {
-        const id      = await this.getActiveId();
-        const ep      = this.getById(id);
-        const key     = `${id}Settings`;
-        const stored  = await chrome.storage.sync.get(key);
-        await ep.init(stored[key] ?? {});
-        return ep;
+    async getActiveList() {
+        const ids = await this.getActiveIds();
+        return Promise.all(ids.map(id => this.getInitialized(id)));
     },
 
     async getSettings(id) {

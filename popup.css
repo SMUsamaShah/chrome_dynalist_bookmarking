@@ -56,20 +56,29 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   min-height: 20px;
 }
 
 #status {
+  flex: 1;
+  min-width: 0;
   font-size: 11px;
   color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 #status.error { color: #c0392b; }
 #status.saved { color: #27ae60; }
+/* Partial success — some targets took the bookmark, some didn't */
+#status.warn  { color: #e67e22; }
 
 #actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 #deleteBtn {
@@ -98,4 +107,8 @@ body {
   font-size: 10px;
   color: #aaa;
   font-style: italic;
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

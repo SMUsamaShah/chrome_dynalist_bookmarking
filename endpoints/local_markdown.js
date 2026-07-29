@@ -41,6 +41,10 @@ export class LocalMarkdownEndpoint extends BookmarkEndpoint {
 
     get settingsSchema() { return []; }
 
+    // The File System Access API and its persisted handles are unavailable in an
+    // MV3 service worker, so this endpoint always runs in the popup's document.
+    get requiresDom() { return true; }
+
     async init(_settings = {}) {}
 
     // Must be called from DOM context (not service worker).

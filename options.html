@@ -11,64 +11,16 @@
   </header>
 
   <main>
-    <section id="endpoint-section">
-      <h2>Active Endpoint</h2>
-      <select id="endpoint-select"></select>
-      <div id="endpoint-warning" style="display:none"></div>
-      <div id="endpoint-links" style="display:none"></div>
-    </section>
-
-    <section id="settings-section">
-      <h2 id="settings-heading">Settings</h2>
-      <form id="settings-form"></form>
-
-      <!-- Browser Storage only: shown in place of the form -->
-      <div id="browser-storage-area" style="display:none">
-        <div class="step">
-          <span class="step-label">Stored bookmarks</span>
-          <div id="bs-count"></div>
-        </div>
-        <div class="step">
-          <span class="step-label">Export</span>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button type="button" id="bs-copy-md-btn">Copy as Markdown</button>
-            <button type="button" id="bs-copy-json-btn">Copy as JSON</button>
-            <button type="button" id="bs-download-btn">Download .md</button>
-          </div>
-          <div id="bs-export-result" style="font-size:12px;color:#27ae60;margin-top:4px"></div>
-        </div>
-        <div class="step">
-          <span class="step-label">Danger zone</span>
-          <button type="button" id="bs-clear-btn" class="btn-danger">Clear all bookmarks</button>
-        </div>
-      </div>
-
-      <!-- Local Markdown only: shown in place of the form -->
-      <div id="file-picker-area" style="display:none">
-
-        <div class="step">
-          <span class="step-label">1 · Choose file</span>
-          <div id="current-file">No file chosen.</div>
-          <button type="button" id="pick-file-btn">Pick Markdown File</button>
-        </div>
-
-        <div class="step" id="grant-step" style="display:none">
-          <span class="step-label">2 · Grant access <small>(once per browser session)</small></span>
-          <div id="permission-status"></div>
-          <button type="button" id="grant-access-btn" style="display:none">Grant file access</button>
-        </div>
-
-      </div>
-    </section>
-
-    <section id="test-section">
-      <button type="button" id="test-btn">Test Connection</button>
-      <span id="test-result"></span>
+    <section id="endpoints-section">
+      <h2>Bookmark targets</h2>
+      <p class="section-note">Every bookmark is saved to all enabled targets. Expand a target to configure it — you don't have to enable it first.</p>
+      <div id="no-targets-notice" style="display:none">No targets enabled — bookmarks won't be saved anywhere.</div>
+      <div id="endpoint-cards"></div>
     </section>
 
     <section id="migrate-section">
       <h2>Migrate Bookmarks</h2>
-      <p class="section-note">Copy all bookmarks from one endpoint into another.</p>
+      <p class="section-note">Copy all bookmarks from one endpoint into another. Independent of which targets are enabled above.</p>
       <div class="field">
         <label for="migrate-source">From</label>
         <select id="migrate-source"></select>
@@ -81,6 +33,46 @@
       <div id="migrate-result"></div>
     </section>
   </main>
+
+  <!-- Endpoint-specific blocks. options.js moves each into its owning card at render
+       time; they live here so their handlers can bind by id at module load. -->
+  <div id="detached-areas" hidden>
+
+    <div id="browser-storage-area">
+      <div class="step">
+        <span class="step-label">Stored bookmarks</span>
+        <div id="bs-count"></div>
+      </div>
+      <div class="step">
+        <span class="step-label">Export</span>
+        <div class="button-row">
+          <button type="button" id="bs-copy-md-btn">Copy as Markdown</button>
+          <button type="button" id="bs-copy-json-btn">Copy as JSON</button>
+          <button type="button" id="bs-download-btn">Download .md</button>
+        </div>
+        <div id="bs-export-result"></div>
+      </div>
+      <div class="step">
+        <span class="step-label">Danger zone</span>
+        <button type="button" id="bs-clear-btn" class="btn-danger">Clear all bookmarks</button>
+      </div>
+    </div>
+
+    <div id="file-picker-area">
+      <div class="step">
+        <span class="step-label">1 · Choose file</span>
+        <div id="current-file">No file chosen.</div>
+        <button type="button" id="pick-file-btn">Pick Markdown File</button>
+      </div>
+
+      <div class="step" id="grant-step" style="display:none">
+        <span class="step-label">2 · Grant access <small>(once per browser session)</small></span>
+        <div id="permission-status"></div>
+        <button type="button" id="grant-access-btn" style="display:none">Grant file access</button>
+      </div>
+    </div>
+
+  </div>
 
   <script src="options.js" type="module"></script>
 </body>

@@ -53,21 +53,64 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // keep channel open for async response
 });
 
+// Run op against every endpoint, letting each succeed or fail on its own — a bookmark
+// that reaches three of four targets is still saved to those three.
+// Returns [{ endpointId, id?, error? }].
+async function fanOut(endpoints, op) {
+    const settled = await Promise.allSettled(endpoints.map(op));
+    return settled.map((r, i) => (
+        r.status === 'fulfilled'
+            ? { endpointId: endpoints[i].id, id: r.value?.id }
+            : { endpointId: endpoints[i].id, error: r.reason?.message ?? String(r.reason) }
+    ));
+}
+
+// Endpoints named in an { endpointId: bookmarkId } map that the worker can run.
+// requiresDom endpoints are dropped — the popup runs those in its own document.
+async function workerTargetsFor(ids = {}) {
+    const targets = await Promise.all(
+        Object.keys(ids)
+            .filter(id => registry.has(id))
+            .map(id => registry.getInitialized(id)),
+    );
+    return targets.filter(ep => !ep.requiresDom);
+}
+
 async function handleMessage(request) {
-    const endpoint = await registry.getActive();
-
     switch (request.message) {
-        case 'getConfig':
-            return { endpointId: endpoint.id, endpointName: endpoint.name };
+        case 'getConfig': {
+            const active = await registry.getActiveList();
+            return {
+                endpoints: active.map(ep => ({
+                    id:          ep.id,
+                    name:        ep.name,
+                    requiresDom: ep.requiresDom,
+                })),
+            };
+        }
 
-        case 'add':
-            return endpoint.add(request.title, request.url, request.note);
+        case 'add': {
+            const targets = (await registry.getActiveList()).filter(ep => !ep.requiresDom);
+            return {
+                results: await fanOut(targets, ep => ep.add(request.title, request.url, request.note)),
+            };
+        }
 
-        case 'update':
-            return endpoint.update(request.id, request.note);
+        // update/delete walk the ids the popup actually captured rather than the active
+        // list, so editing still works if a target is unchecked while the popup is open.
+        case 'update': {
+            const targets = await workerTargetsFor(request.ids);
+            return {
+                results: await fanOut(targets, ep => ep.update(request.ids[ep.id], request.note)),
+            };
+        }
 
-        case 'delete':
-            return endpoint.delete(request.id);
+        case 'delete': {
+            const targets = await workerTargetsFor(request.ids);
+            return {
+                results: await fanOut(targets, ep => ep.delete(request.ids[ep.id])),
+            };
+        }
 
         default:
             return { error: `unknown message: ${request.message}` };

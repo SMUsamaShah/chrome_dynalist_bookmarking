@@ -2,14 +2,18 @@ export class BookmarkEndpoint {
     get id()   { throw new Error('not implemented'); }
     get name() { throw new Error('not implemented'); }
 
-    // Optional warning shown in the options page below the endpoint selector
+    // Optional warning shown inside this endpoint's card on the options page
     get warning() { return null; }
 
-    // Optional array of { label, url } links shown below the endpoint selector
+    // Optional array of { label, url } links shown inside this endpoint's card
     get links() { return []; }
 
     // Array of { key, label, type ('text'|'password'|'checkbox'), required, placeholder }
     get settingsSchema() { return []; }
+
+    // True if this endpoint must run in a document context rather than the service
+    // worker (e.g. the File System Access API). The popup executes these locally.
+    get requiresDom() { return false; }
 
     async init(settings) {}
 

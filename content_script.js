@@ -25,15 +25,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ ok: true });
         return true;
     }
-
-    if (request.message === 'removepopup') {
-        if (dyniframe) {
-            dyniframe.remove();
-            dyniframe = null;
-        }
-        sendResponse({ ok: true });
-        return true;
-    }
 });
 
 // Click outside the popup closes it

@@ -27,12 +27,22 @@ Made this to work with Dynalist originally where I could dump any interesting UR
 - Dynalist
 - Workflowy
 - Github Gist
+- Downloads folder file
+- Browser storage (not recommended, can be cleared by Chrome)
+
+You can enable more than one at a time. Every bookmark is saved to all of them, so
+you can keep Dynalist for daily use and a Gist as a plain text backup. If one target
+fails (expired token, no network) the bookmark is still saved to the others and the
+popup tells you which one didn't take it.
 
 ## Install
 
 1. Clone or download this repo
 2. Go to `chrome://extensions` → enable Developer mode → Load unpacked → select this folder
-3. Open the extension options, pick an endpoint, fill in any required settings
+3. Open the extension options, tick one or more targets, fill in any required settings
+
+Each target is a card in the options page. Expand a card to configure it — you don't
+have to enable it first, so you can paste a token and hit Test before switching it on.
 
 # Future Ideas, maybe
 

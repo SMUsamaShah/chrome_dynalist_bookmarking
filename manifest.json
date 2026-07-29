@@ -48,6 +48,7 @@
       "endpoints/registry.js",
       "endpoints/dynalist.js",
       "endpoints/workflowy.js",
+      "endpoints/gist.js",
       "endpoints/local_markdown.js",
       "endpoints/downloads_file.js",
       "endpoints/browser_storage.js"
